@@ -11,38 +11,68 @@ const emptyPanel = document.getElementById('empty');
 const cameraError = document.getElementById('camera-error');
 const cameraErrorText = document.getElementById('camera-error-text');
 const cameraRetry = document.getElementById('camera-retry');
+const lensSwitch = document.getElementById('lens');
 
 const VIEW_KEY = 'doodle:view';
 const MIN_SCALE = 0.02;
 const MAX_SCALE = 40;
 
-// Where the picture sits: offset of its center from the screen center, plus size, turn and transparency.
-const view = { x: 0, y: 0, scale: 1, rotation: 0, opacity: 0.5, locked: false };
+// Where the picture sits (offset of its center from the screen center, size, turn, transparency),
+// plus the lock and which camera lens is in use.
+const view = { x: 0, y: 0, scale: 1, rotation: 0, opacity: 0.5, locked: false, lens: '1' };
 let objectUrl = null;
 
 /* ---------- Camera ---------- */
 
+// Camera names are only readable after permission is granted, and are in the phone's language.
+const ULTRA_WIDE_LABEL = /ultra[\s-]?wide|超廣角|超广角/i;
+
 let stream = null;
+let ultraWideId; // undefined = not looked for yet, null = this phone has none
+let cameraAttempt = 0;
 
 async function startCamera() {
   if (!navigator.mediaDevices?.getUserMedia) {
     showCameraError("This browser can't use the camera here. The page must be opened over https.");
     return;
   }
+  const attempt = ++cameraAttempt;
+  const useUltraWide = view.lens === '0.5' && Boolean(ultraWideId);
   stopCamera();
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
+    const next = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
-        facingMode: { ideal: 'environment' },
+        // 4:3, the Camera app's Photo-mode shape, so nothing is cropped away.
         width: { ideal: 1920 },
-        height: { ideal: 1080 },
+        height: { ideal: 1440 },
+        ...(useUltraWide
+          ? { deviceId: { exact: ultraWideId } }
+          : { facingMode: { ideal: 'environment' } }),
       },
     });
+    // A newer start (e.g. a quick lens switch) replaced this one.
+    if (attempt !== cameraAttempt) {
+      next.getTracks().forEach((track) => track.stop());
+      return;
+    }
+    stream = next;
     video.srcObject = stream;
     await video.play();
     cameraError.hidden = true;
+
+    if (ultraWideId === undefined) {
+      await findUltraWide();
+      if (view.lens === '0.5' && ultraWideId) startCamera();
+    }
   } catch (err) {
+    if (attempt !== cameraAttempt) return;
+    if (useUltraWide && err.name === 'OverconstrainedError') {
+      ultraWideId = null;
+      updateLensSwitch();
+      startCamera();
+      return;
+    }
     const messages = {
       NotAllowedError: 'Camera access is blocked. Allow it for this site in Settings › Apps › Safari › Camera, then try again.',
       NotFoundError: 'No camera was found on this device.',
@@ -67,6 +97,37 @@ function showCameraError(message) {
 }
 
 cameraRetry.addEventListener('click', startCamera);
+
+/* ---------- 0.5× / 1× lens switch ---------- */
+
+async function findUltraWide() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    ultraWideId = devices.find((d) => d.kind === 'videoinput' && ULTRA_WIDE_LABEL.test(d.label))?.deviceId || null;
+  } catch {
+    ultraWideId = null;
+  }
+  updateLensSwitch();
+}
+
+// Only shown when the phone has an ultra-wide lens we can pick.
+function updateLensSwitch() {
+  lensSwitch.hidden = !ultraWideId;
+  const active = ultraWideId ? view.lens : '1';
+  lensSwitch.querySelectorAll('[data-lens]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.lens === active));
+  });
+}
+
+lensSwitch.querySelectorAll('[data-lens]').forEach((button) => {
+  button.addEventListener('click', () => {
+    if (view.lens === button.dataset.lens) return;
+    view.lens = button.dataset.lens;
+    saveView();
+    updateLensSwitch();
+    startCamera();
+  });
+});
 
 /* ---------- Keep the screen awake ---------- */
 

@@ -29,13 +29,13 @@ body {
   display: none !important;
 }
 
-/* Live camera fills the screen */
+/* Live camera shows the whole frame, like the Camera app's Photo mode */
 #camera {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* Gesture surface: the whole screen, so small pictures are still easy to grab */
@@ -158,6 +158,36 @@ input[type="range"] {
   accent-color: var(--accent);
 }
 
+/* 0.5× / 1× lens switch, sitting just above the toolbar */
+#lens {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 16px + 60px + var(--gap));
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bar-bg);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+#lens button {
+  min-width: 44px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#lens button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--accent);
+}
+
 /* Lock button shows one of two icons */
 #lock .locked {
   display: none;
@@ -182,7 +212,8 @@ body.is-locked #lock .unlocked {
 }
 
 body.is-locked [data-action="pick"],
-body.is-locked #reset {
+body.is-locked #reset,
+body.is-locked #lens {
   display: none;
 }
 
