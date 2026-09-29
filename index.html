@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Doodle</title>
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Doodle">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <video id="camera" playsinline muted autoplay></video>
+
+  <div id="stage">
+    <img id="overlay" alt="" hidden>
+  </div>
+
+  <div id="empty" class="panel" hidden>
+    <p>Pick a picture to trace.</p>
+    <button type="button" class="primary" data-action="pick">Choose picture</button>
+  </div>
+
+  <div id="camera-error" class="panel" hidden>
+    <p id="camera-error-text">The camera isn't on.</p>
+    <button type="button" class="primary" id="camera-retry">Turn on camera</button>
+  </div>
+
+  <div id="toolbar">
+    <button type="button" class="icon" data-action="pick" aria-label="Choose picture">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
+    </button>
+
+    <label class="opacity">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16a8 8 0 0 0 0-16z" class="fill"/></svg>
+      <input id="opacity" type="range" min="0.05" max="1" step="0.01" value="0.5" aria-label="Transparency">
+    </label>
+
+    <button type="button" class="icon" id="reset" aria-label="Reset position">
+      <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>
+    </button>
+
+    <button type="button" class="icon" id="lock" aria-label="Lock picture" aria-pressed="false">
+      <svg viewBox="0 0 24 24" class="unlocked"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>
+      <svg viewBox="0 0 24 24" class="locked"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    </button>
+  </div>
+
+  <input id="file" type="file" accept="image/*" hidden>
+
+  <script src="app.js"></script>
+</body>
+</html>
