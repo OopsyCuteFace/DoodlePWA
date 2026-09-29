@@ -43,9 +43,9 @@ async function startCamera() {
     const next = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
-        // 4:3, the Camera app's Photo-mode shape, so nothing is cropped away.
+        // 16:9 is closest to a phone screen's shape, so the least is trimmed when filling it.
         width: { ideal: 1920 },
-        height: { ideal: 1440 },
+        height: { ideal: 1080 },
         ...(useUltraWide
           ? { deviceId: { exact: ultraWideId } }
           : { facingMode: { ideal: 'environment' } }),

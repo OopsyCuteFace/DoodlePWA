@@ -29,13 +29,13 @@ body {
   display: none !important;
 }
 
-/* Live camera shows the whole frame, like the Camera app's Photo mode */
+/* Live camera fills the screen, no black bars */
 #camera {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 /* Gesture surface: the whole screen, so small pictures are still easy to grab */
