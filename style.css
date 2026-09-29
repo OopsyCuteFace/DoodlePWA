@@ -91,13 +91,26 @@ button.primary {
   font-weight: 600;
 }
 
-/* Bottom toolbar */
-#toolbar {
+/* Bottom controls, stacked: lens switch, angle, toolbar */
+#controls {
   position: fixed;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: calc(env(safe-area-inset-bottom) + 16px);
-  transform: translateX(-50%);
-  width: min(480px, calc(100% - 32px));
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap);
+  pointer-events: none;
+}
+
+#controls > * {
+  pointer-events: auto;
+}
+
+.bar {
+  width: min(480px, 100%);
   display: flex;
   align-items: center;
   gap: var(--gap);
@@ -158,12 +171,63 @@ input[type="range"] {
   accent-color: var(--accent);
 }
 
-/* 0.5× / 1× lens switch, sitting just above the toolbar */
+/* Angle slider with tick marks at every 45° */
+#rotate {
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+#rotate > svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.rotate-track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.ticks {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: -6px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.ticks span {
+  width: 1px;
+  height: 4px;
+  background: var(--muted);
+}
+
+.ticks span.major {
+  height: 7px;
+}
+
+#rotation-value {
+  flex: none;
+  min-width: 56px;
+  height: 44px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+#rotation-value:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 0.5× / 1× lens switch */
 #lens {
-  position: fixed;
-  left: 50%;
-  bottom: calc(env(safe-area-inset-bottom) + 16px + 60px + var(--gap));
-  transform: translateX(-50%);
   display: flex;
   gap: 4px;
   padding: 4px;
@@ -213,7 +277,9 @@ body.is-locked #lock .unlocked {
 
 body.is-locked [data-action="pick"],
 body.is-locked #reset,
-body.is-locked #lens {
+body.is-locked #lens,
+body.is-locked #rotate,
+body.no-image #rotate {
   display: none;
 }
 

@@ -31,29 +31,42 @@
     <button type="button" class="primary" id="camera-retry">Turn on camera</button>
   </div>
 
-  <div id="lens" role="group" aria-label="Camera lens" hidden>
-    <button type="button" data-lens="0.5" aria-pressed="false">0.5×</button>
-    <button type="button" data-lens="1" aria-pressed="true">1×</button>
-  </div>
+  <div id="controls">
+    <div id="lens" role="group" aria-label="Camera lens" hidden>
+      <button type="button" data-lens="0.5" aria-pressed="false">0.5×</button>
+      <button type="button" data-lens="1" aria-pressed="true">1×</button>
+    </div>
 
-  <div id="toolbar">
-    <button type="button" class="icon" data-action="pick" aria-label="Choose picture">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
-    </button>
+    <div id="rotate" class="bar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16"/><path d="M4 19L16 5"/><path d="M11 19a7 7 0 0 0-2-4.9"/></svg>
+      <div class="rotate-track">
+        <input id="rotation" type="range" min="-180" max="180" step="1" value="0" aria-label="Angle">
+        <div class="ticks" aria-hidden="true">
+          <span class="major"></span><span></span><span class="major"></span><span></span><span class="major"></span><span></span><span class="major"></span><span></span><span class="major"></span>
+        </div>
+      </div>
+      <button type="button" id="rotation-value" aria-label="Reset angle to 0°">0°</button>
+    </div>
 
-    <label class="opacity">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16a8 8 0 0 0 0-16z" class="fill"/></svg>
-      <input id="opacity" type="range" min="0.05" max="1" step="0.01" value="0.5" aria-label="Transparency">
-    </label>
+    <div id="toolbar" class="bar">
+      <button type="button" class="icon" data-action="pick" aria-label="Choose picture">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
+      </button>
 
-    <button type="button" class="icon" id="reset" aria-label="Reset position">
-      <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>
-    </button>
+      <label class="opacity">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16a8 8 0 0 0 0-16z" class="fill"/></svg>
+        <input id="opacity" type="range" min="0.05" max="1" step="0.01" value="0.5" aria-label="Transparency">
+      </label>
 
-    <button type="button" class="icon" id="lock" aria-label="Lock picture" aria-pressed="false">
-      <svg viewBox="0 0 24 24" class="unlocked"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>
-      <svg viewBox="0 0 24 24" class="locked"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-    </button>
+      <button type="button" class="icon" id="reset" aria-label="Reset position">
+        <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4h4"/></svg>
+      </button>
+
+      <button type="button" class="icon" id="lock" aria-label="Lock picture" aria-pressed="false">
+        <svg viewBox="0 0 24 24" class="unlocked"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>
+        <svg viewBox="0 0 24 24" class="locked"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </button>
+    </div>
   </div>
 
   <input id="file" type="file" accept="image/*" hidden>

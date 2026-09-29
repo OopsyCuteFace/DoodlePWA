@@ -12,10 +12,14 @@ const cameraError = document.getElementById('camera-error');
 const cameraErrorText = document.getElementById('camera-error-text');
 const cameraRetry = document.getElementById('camera-retry');
 const lensSwitch = document.getElementById('lens');
+const rotationInput = document.getElementById('rotation');
+const rotationValue = document.getElementById('rotation-value');
 
 const VIEW_KEY = 'doodle:view';
 const MIN_SCALE = 0.02;
 const MAX_SCALE = 40;
+const SNAP_EVERY = 45; // degrees
+const SNAP_WITHIN = 4; // degrees
 
 // Where the picture sits (offset of its center from the screen center, size, turn, transparency),
 // plus the lock and which camera lens is in use.
@@ -171,6 +175,7 @@ function fitToScreen() {
   view.rotation = 0;
   view.scale = Math.min((stage.clientWidth * 0.85) / w, (stage.clientHeight * 0.7) / h);
   render();
+  showRotation();
   saveView();
 }
 
@@ -226,6 +231,7 @@ stage.addEventListener('pointermove', (e) => {
     view.y = mid.y + (vx * sin + vy * cos) * ratio - cy;
     view.scale = scale;
     view.rotation = start.rotation + turn;
+    showRotation();
   }
   render();
 });
@@ -267,6 +273,42 @@ opacityInput.addEventListener('input', () => {
 opacityInput.addEventListener('change', saveView);
 
 resetButton.addEventListener('click', fitToScreen);
+
+/* ---------- Angle slider ---------- */
+
+// The angle in degrees, between -180 and 180 (twisting with two fingers can go round many times).
+function rotationDegrees() {
+  const degrees = (view.rotation * 180) / Math.PI;
+  return ((((degrees + 180) % 360) + 360) % 360) - 180;
+}
+
+function showRotation() {
+  const degrees = Math.round(rotationDegrees());
+  rotationInput.value = degrees;
+  rotationValue.textContent = `${degrees}°`;
+}
+
+rotationInput.addEventListener('input', () => {
+  let degrees = Number(rotationInput.value);
+  // Snap to 0°, 45°, 90°… when close, so those exact angles are easy to hit.
+  const nearest = Math.round(degrees / SNAP_EVERY) * SNAP_EVERY;
+  if (Math.abs(degrees - nearest) <= SNAP_WITHIN) {
+    degrees = nearest;
+    rotationInput.value = degrees;
+  }
+  view.rotation = (degrees * Math.PI) / 180;
+  render();
+  // Leave the slider where the finger is, so 180° doesn't jump to the -180° end.
+  rotationValue.textContent = `${degrees}°`;
+});
+rotationInput.addEventListener('change', saveView);
+
+rotationValue.addEventListener('click', () => {
+  view.rotation = 0;
+  render();
+  showRotation();
+  saveView();
+});
 
 lockButton.addEventListener('click', () => {
   setLocked(!view.locked);
@@ -349,6 +391,7 @@ async function loadImage() {
 async function init() {
   loadView();
   opacityInput.value = view.opacity;
+  showRotation();
   setLocked(view.locked);
 
   document.body.classList.add('no-image');
